@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User, Package, MapPin, CreditCard, Settings, ChevronRight, Heart, Gift, LogOut, ArrowLeft, Plus } from 'lucide-react';
+import { User, Package, MapPin, CreditCard, Settings, ChevronRight, Heart, Gift, LogOut, ArrowLeft, Plus, LayoutGrid, Clock, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import ProductCard from '@/components/features/product/ProductCard';
+import ReviewModal from '@/components/features/reviews/ReviewModal';
+import InvoiceModal from '@/components/features/orders/InvoiceModal';
 
 
 const Account = () => {
@@ -54,6 +56,104 @@ const Account = () => {
     }
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [orders, setOrders] = useState([
+    {
+      id: "ORD-9902",
+      date: "2026-04-12",
+      deliveryDate: "2026-04-15",
+      status: "Delivered",
+      paymentMethod: "Online (Visa •••• 4242)",
+      total: 1295.00,
+      items: [
+        { 
+          id: 1, 
+          name: "Signature Silk Blazer", 
+          image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
+          price: 895.00,
+          size: "M",
+          color: "Midnight Black"
+        },
+        { 
+          id: 5, 
+          name: "Tailored Wool Trousers", 
+          image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=80",
+          price: 400.00,
+          size: "32",
+          color: "Charcoal"
+        }
+      ]
+    },
+    {
+      id: "ORD-8841",
+      date: "2026-03-28",
+      deliveryDate: "2026-03-31",
+      status: "Delivered",
+      paymentMethod: "Cash on Delivery",
+      total: 350.00,
+      items: [
+        { 
+          id: 10, 
+          name: "Cashmere Knit Sweater", 
+          image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80",
+          price: 350.00,
+          size: "L",
+          color: "Ivory"
+        }
+      ]
+    },
+    {
+      id: "ORD-7712",
+      date: "2026-04-28",
+      status: "Processing",
+      paymentMethod: "Online (Visa •••• 4242)",
+      total: 150.00,
+      items: [
+        { 
+          id: 12, 
+          name: "Luxury Silk Tie", 
+          image: "https://images.unsplash.com/photo-1598033129183-c4f50c7176c8?w=800&q=80",
+          price: 150.00,
+          size: "OS",
+          color: "Emerald"
+        }
+      ]
+    },
+    {
+      id: "ORD-7655",
+      date: "2026-04-25",
+      status: "Shipped",
+      paymentMethod: "Online (Mastercard •••• 8812)",
+      total: 620.00,
+      items: [
+        { 
+          id: 15, 
+          name: "Suede Chelsea Boots", 
+          image: "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=800&q=80",
+          price: 620.00,
+          size: "42",
+          color: "Tan"
+        }
+      ]
+    }
+  ]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderFilter, setOrderFilter] = useState('ALL');
+
+  const cancelOrder = (orderId) => {
+    const order = orders.find(o => o.id === orderId);
+    if (window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'Cancelled' } : o));
+      
+      if (order.paymentMethod.toLowerCase().includes('online')) {
+        toast.success('Order cancelled. Refund will be initiated in 24 hours!');
+      } else {
+        toast.success('Order cancelled successfully.');
+      }
+    }
+  };
 
   useEffect(() => {
     setActiveTab(queryParams.get('tab') || 'dashboard');
@@ -130,25 +230,157 @@ const Account = () => {
       case 'orders':
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <h2 className="text-[20px] font-black uppercase tracking-tighter">Your Orders</h2>
-              <div className="flex gap-4">
-                 <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b-2 border-transparent hover:text-black">All</button>
-                 <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b-2 border-transparent">Processing</button>
-                 <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b-2 border-transparent">Shipped</button>
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                 {[
+                   { id: 'ALL', label: 'All', icon: LayoutGrid },
+                   { id: 'PROCESSING', label: 'Processing', icon: Clock },
+                   { id: 'SHIPPED', label: 'Shipped', icon: Truck },
+                   { id: 'DELIVERED', label: 'Delivered', icon: CheckCircle },
+                   { id: 'CANCELLED', label: 'Cancelled', icon: XCircle }
+                 ].map((filter) => (
+                   <button 
+                     key={filter.id}
+                     onClick={() => setOrderFilter(filter.id)}
+                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
+                       orderFilter === filter.id 
+                         ? 'bg-black text-white border-black shadow-lg scale-105' 
+                         : 'bg-white text-gray-400 border-gray-100 hover:border-black hover:text-black'
+                     }`}
+                   >
+                     <filter.icon className={`w-3 h-3 ${orderFilter === filter.id ? 'text-white' : 'text-gray-400'}`} />
+                     {filter.label}
+                   </button>
+                 ))}
               </div>
             </div>
             
-            <div className="bg-gray-50/50 border border-dashed border-gray-200 rounded-lg py-20 flex flex-col items-center justify-center text-center px-6">
-               <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
-                  <Package className="w-6 h-6 text-gray-300" />
-               </div>
-               <h3 className="text-sm font-black uppercase tracking-widest mb-2">No orders found</h3>
-               <p className="text-[11px] text-gray-400 uppercase tracking-widest max-w-[240px] mb-8">You haven't placed any orders yet. Start shopping to fill this space!</p>
-               <Link to="/shop" className="bg-black text-white px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-800 transition-all">
-                  Shop Collection
-               </Link>
-            </div>
+            {(() => {
+              const filteredOrders = orders.filter(o => 
+                orderFilter === 'ALL' || o.status.toUpperCase() === orderFilter
+              );
+
+              return filteredOrders.length > 0 ? (
+                <div className="space-y-8">
+                  {filteredOrders.map((order) => (
+                  <div key={order.id} className="border border-gray-100 rounded-sm overflow-hidden bg-white shadow-sm">
+                    <div className="bg-gray-50/50 p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-100">
+                      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-x-4 gap-y-6 md:gap-8">
+                        <div>
+                          <p className="text-[8px] md:text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Order ID</p>
+                          <p className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{order.id}</p>
+                        </div>
+                        <div>
+                          <p className="text-[8px] md:text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Date Placed</p>
+                          <p className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">{order.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-[8px] md:text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Total Amount</p>
+                          <p className="text-[10px] md:text-[11px] font-black uppercase tracking-widest">${order.total.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[8px] md:text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Status</p>
+                          <div className="flex items-center gap-2">
+                             <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 md:py-1 ${order.status === 'Cancelled' ? 'bg-red-50 text-red-500 border border-red-100' : 'bg-black text-white'}`}>{order.status}</span>
+                             {order.deliveryDate && order.status !== 'Cancelled' && (
+                               <span className="text-[8px] md:text-[9px] font-bold text-gray-500 uppercase tracking-widest">on {order.deliveryDate}</span>
+                             )}
+                          </div>
+                        </div>
+                        <div className="col-span-2 md:col-span-1">
+                          <p className="text-[8px] md:text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Payment</p>
+                          <p className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest ${order.status === 'Cancelled' ? 'text-gray-400 line-through' : 'text-[#D4AF37]'}`}>{order.paymentMethod}</p>
+                          {order.status === 'Cancelled' && order.paymentMethod.toLowerCase().includes('online') && (
+                            <p className="text-[7px] md:text-[8px] font-bold text-green-600 uppercase tracking-widest mt-1 animate-pulse italic">Refund processing in 24 hours</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                        {order.status === 'Processing' && (
+                          <button 
+                            onClick={() => cancelOrder(order.id)}
+                            className="w-full md:w-auto text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-6 py-3 md:py-1 transition-all text-center"
+                          >
+                            Cancel Order
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setShowInvoiceModal(true);
+                          }}
+                          className="w-full md:w-auto text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 border-black hover:bg-black hover:text-white px-6 py-3 md:py-1 transition-all text-center"
+                        >
+                          View Invoice
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 divide-y divide-gray-50">
+                      {order.items.map((item) => (
+                        <div key={item.id} className="py-6 first:pt-0 last:pb-0 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                          <div className="flex gap-6 items-center">
+                            <div className="w-20 h-24 bg-gray-100 overflow-hidden shrink-0">
+                              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                              <h4 className="text-[12px] font-black uppercase tracking-widest mb-1">{item.name}</h4>
+                              <p className="text-[10px] text-gray-400 uppercase tracking-widest">Size: {item.size} | Color: {item.color}</p>
+                              <p className="text-[11px] font-black mt-2">${item.price.toFixed(2)}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <button 
+                              onClick={() => {
+                                setSelectedProduct(item);
+                                setShowReviewModal(true);
+                              }}
+                              className="w-full md:w-auto bg-black text-white px-6 py-4 md:py-3 text-[9px] font-black uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                            >
+                              Give Review
+                            </button>
+                            <Link to={`/product/${item.id}`} className="w-full md:w-auto border border-black px-6 py-4 md:py-3 text-[9px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all text-center">
+                              Buy Again
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-50/50 border border-dashed border-gray-200 rounded-lg py-20 flex flex-col items-center justify-center text-center px-6">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
+                   <Package className="w-6 h-6 text-gray-300" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-widest mb-2">No {orderFilter.toLowerCase()} orders found</h3>
+                <p className="text-[11px] text-gray-400 uppercase tracking-widest max-w-[240px] mb-8">Try selecting a different filter or explore our shop!</p>
+                <Link to="/shop" className="bg-black text-white px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-800 transition-all">
+                   Shop Collection
+                </Link>
+              </div>
+            );
+            })()}
+
+            {selectedProduct && (
+              <ReviewModal 
+                isOpen={showReviewModal}
+                onClose={() => setShowReviewModal(false)}
+                product={selectedProduct}
+                user={user}
+              />
+            )}
+
+            {selectedOrder && (
+              <InvoiceModal
+                isOpen={showInvoiceModal}
+                onClose={() => setShowInvoiceModal(false)}
+                order={selectedOrder}
+              />
+            )}
           </div>
         );
       case 'addresses':

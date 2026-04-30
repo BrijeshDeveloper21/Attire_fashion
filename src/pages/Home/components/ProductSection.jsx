@@ -11,12 +11,12 @@ const ProductSection = ({
   theme = "light",
   gridCols = "md:grid-cols-5",
   maxContentWidth = "max-w-[1600px]",
-  mobileGridCols = "flex overflow-x-auto"
+  mobileGridCols = "grid grid-cols-2"
 }) => {
   const isDark = theme === "dark";
 
   return (
-    <section className={`py-4 md:py-4 ${isDark ? 'bg-black text-white' : 'bg-white border-y border-gray-50'}`}>
+    <section className={`py-2 md:py-4 ${isDark ? 'bg-black text-white' : 'bg-white border-y border-gray-50'}`}>
       <div className={`${maxContentWidth} mx-auto px-4 md:px-12`}>
         <div className="flex justify-between items-end mb-3 md:mb-4">
           <div className="flex flex-col gap-1">
@@ -39,9 +39,9 @@ const ProductSection = ({
           </Link>
         </div>
 
-        <div className={`${mobileGridCols} md:grid ${gridCols} gap-4 md:gap-8 pb-8 md:pb-0 hide-scrollbar -mx-2 px-2 md:mx-0 md:px-0`}>
+        <div className={`${mobileGridCols} md:grid ${gridCols} gap-4 md:gap-8 pb-2 md:pb-0 hide-scrollbar px-0 md:px-0`}>
           {products.map(product => (
-            <div key={product.id} className={`${mobileGridCols.includes('grid-cols') ? '' : 'w-[160px]'} md:w-auto shrink-0 md:shrink group`}>
+            <div key={product.id} className="w-auto group">
               <ProductCard product={product} />
             </div>
           ))}

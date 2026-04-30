@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { products } from '@/data/products';
+import { useGlobalStore } from '@/store/globalStore';
 
 
 const Categories = () => {
   const navigate = useNavigate();
+  const products = useGlobalStore(state => state.products);
   
   const categoriesList = [
     { name: 'Signature Ethnic', img: '/products/Gujarati_Kurta_Collection/asymmetrical.png', path: '/shop?category=Signature Ethnic' },

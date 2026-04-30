@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUp } from 'lucide-react';
-import { products } from '@/data/products';
+import { useGlobalStore } from '@/store/globalStore';
 import { 
   HeroCarousel, 
   CategoryNav, 
@@ -12,6 +12,8 @@ import {
 } from './components';
 
 const Home = () => {
+  const products = useGlobalStore(state => state.products);
+
   return (
     <main className="bg-white">
       <HeroCarousel />
@@ -50,6 +52,7 @@ const Home = () => {
       {/* Urban Denim */}
       <ProductSection 
         title="Urban Denim Collective"
+        tagline="Denim 2026"
         viewAllPath="/shop?category=Urban Denim Collective"
         products={products.filter(p => p.category === 'Urban Denim Collective').slice(0, 5)}
       />
@@ -57,6 +60,7 @@ const Home = () => {
       {/* Trending Now */}
       <ProductSection 
         title="Trending Now"
+        tagline="Global Edit 2026"
         viewAllPath="/shop"
         products={products.filter(p => p.category === 'Trending Now').slice(0, 5)}
       />
@@ -66,12 +70,14 @@ const Home = () => {
       {/* Best Sellers */}
       <ProductSection 
         title="Best Sellers"
+        tagline="Popular 2026"
         products={products.slice(8, 13)}
       />
 
       {/* Handpicked */}
       <ProductSection 
         title="Handpicked for You"
+        tagline="Curated 2026"
         products={products.slice(15, 20)}
       />
 

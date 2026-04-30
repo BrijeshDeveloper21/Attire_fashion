@@ -10,7 +10,7 @@ const RelatedProducts = ({ products, currentProductId, category }) => {
   if (related.length === 0) return null;
 
   return (
-    <section className="mt-20 pt-16 border-t border-gray-100">
+    <section className="mt-8 md:mt-20 pt-8 md:pt-16 border-t border-gray-100">
        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="flex flex-col gap-2">
              <span className="text-[10px] font-black tracking-[0.5em] text-brand-gold uppercase">The Collection</span>

@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Globe, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Globe, Loader2 } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login({ name: 'Guest User', email });
-    navigate('/');
+    setIsSubmitting(true);
+    
+    const result = await login(email, password);
+    
+    setIsSubmitting(false);
+    if (result.success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -25,7 +31,9 @@ const Login = () => {
         className="max-w-md w-full"
       >
         <div className="text-center mb-12">
-          <img src="/LOGO.png" alt="Attire Logo" className="h-12 mx-auto mb-8" />
+          <Link to="/">
+             <img src="/LOGO.png" alt="Attire Logo" className="h-12 mx-auto mb-8" />
+          </Link>
           <h1 className="text-3xl font-black tracking-tighter uppercase mb-2">Welcome Back</h1>
           <p className="text-gray-500 text-sm uppercase tracking-widest">Sign in to your premium account</p>
         </div>
@@ -36,7 +44,8 @@ const Login = () => {
             <input
               type="email"
               required
-              className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-gold focus:bg-white px-12 py-4 rounded-sm outline-none transition-all font-medium"
+              disabled={isSubmitting}
+              className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-gold focus:bg-white px-12 py-4 rounded-sm outline-none transition-all font-medium disabled:opacity-50"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -48,7 +57,8 @@ const Login = () => {
             <input
               type="password"
               required
-              className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-gold focus:bg-white px-12 py-4 rounded-sm outline-none transition-all font-medium"
+              disabled={isSubmitting}
+              className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-gold focus:bg-white px-12 py-4 rounded-sm outline-none transition-all font-medium disabled:opacity-50"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -63,10 +73,20 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-5 flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] text-sm hover:bg-brand-gold transition-colors group shadow-xl"
+            disabled={isSubmitting}
+            className="w-full bg-black text-white py-5 flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] text-sm hover:bg-brand-gold transition-colors group shadow-xl disabled:bg-gray-400"
           >
-            Sign In
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Signing In...
+              </>
+            ) : (
+              <>
+                Sign In
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
           </button>
         </form>
 

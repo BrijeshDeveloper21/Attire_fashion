@@ -7,23 +7,31 @@ import { CartPanel } from '@/components/features';
 import { CartProvider, useCart } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { WishlistProvider } from '@/context/WishlistContext';
+import { ReviewProvider } from '@/context/ReviewContext';
+import { useGlobalStore } from '@/store/globalStore';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 
 const AppContent = () => {
   const { isCartOpen, openCart, closeCart } = useCart();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const fetchInitialData = useGlobalStore(state => state.fetchInitialData);
 
   useEffect(() => {
+    // Initial data sync
+    fetchInitialData();
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [fetchInitialData]);
 
   return (
     <>
       <ScrollToTop />
+      <Toaster position="top-center" reverseOrder={false} />
       <Preloader loading={loading} />
 
       {!loading && (
@@ -61,7 +69,9 @@ const App = () => {
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
-          <AppContent />
+          <ReviewProvider>
+            <AppContent />
+          </ReviewProvider>
         </WishlistProvider>
       </CartProvider>
     </AuthProvider>

@@ -56,7 +56,7 @@ const Shop = () => {
         />
 
         {/* Grouped Product Display */}
-        <div className="space-y-16 md:space-y-24 mb-32">
+        <div className="space-y-4 md:space-y-24 mb-32">
           {(() => {
             // Re-order categories to put selected one first
             const orderedCategories = [...categories.filter(c => c !== 'All')];

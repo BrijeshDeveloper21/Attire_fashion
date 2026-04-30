@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { products } from '@/data/products';
+import { useGlobalStore } from '@/store/globalStore';
 
 export const useFilteredProducts = (categoryParam, searchParam, sortBy) => {
+  const products = useGlobalStore(state => state.products);
+  
   const filteredProducts = useMemo(() => {
     let result = products;
 
@@ -37,11 +39,11 @@ export const useFilteredProducts = (categoryParam, searchParam, sortBy) => {
     }
 
     return result;
-  }, [categoryParam, searchParam, sortBy]);
+  }, [categoryParam, searchParam, sortBy, products]);
 
   const categories = useMemo(() => {
     return ['All', ...new Set(products.map(p => p.category))];
-  }, []);
+  }, [products]);
 
   return { filteredProducts, categories };
 };

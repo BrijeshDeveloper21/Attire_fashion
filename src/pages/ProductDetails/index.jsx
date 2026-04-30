@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { products } from '@/data/products';
+import { useGlobalStore } from '@/store/globalStore';
 import { useCart } from '@/context/CartContext';
 import { 
   Breadcrumbs, 
   ProductGallery, 
   ProductInfo, 
-  RelatedProducts 
+  RelatedProducts,
+  ProductReviews 
 } from './components';
 import { ProductSection } from '@/pages/Home/components';
 
@@ -14,9 +15,10 @@ import { ProductSection } from '@/pages/Home/components';
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const products = useGlobalStore(state => state.products);
   const product = products.find(p => p.id === parseInt(id));
   
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0]);
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
   const [activeImg, setActiveImg] = useState(0);
 
   useEffect(() => {
@@ -48,13 +50,19 @@ const ProductDetails = () => {
             setActiveImg={setActiveImg} 
           />
 
-          <ProductInfo 
-            product={product}
-            selectedSize={selectedSize}
-            setSelectedSize={setSelectedSize}
-            addToCart={addToCart}
-          />
+          <div className="lg:col-span-5 relative">
+            <div className="sticky top-24">
+              <ProductInfo 
+                product={product}
+                selectedSize={selectedSize}
+                setSelectedSize={setSelectedSize}
+                addToCart={addToCart}
+              />
+            </div>
+          </div>
         </div>
+
+        <ProductReviews productId={product.id} />
 
         <RelatedProducts 
           products={products}
@@ -63,7 +71,7 @@ const ProductDetails = () => {
         />
 
         {/* Category Wise Product Feed */}
-        <div className="mt-20 space-y-12">
+        <div className="mt-4 md:mt-20 space-y-2 md:space-y-12">
           {(() => {
             const categories = [...new Set(products.map(p => p.category))];
             // Sort categories to show something interesting first or just alpha
