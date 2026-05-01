@@ -18,7 +18,7 @@ const CategoryNav = () => {
   return (
     <section className="bg-white border-b border-gray-100 py-1 md:py-2">
       <div className="max-w-[1600px] mx-auto px-4 md:px-12">
-        <div className="overflow-x-auto hide-scrollbar">
+        <div className="overflow-x-auto hide-scrollbar overscroll-x-contain">
           <div className="flex gap-4 md:gap-6 min-w-max md:justify-center">
             {categories.map((item, idx) => (
               <Link to={item.path} key={idx} className="flex flex-col items-center w-[85px] md:w-[120px] shrink-0 group cursor-pointer">

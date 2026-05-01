@@ -87,7 +87,7 @@ const HeroCarousel = () => {
   };
 
   return (
-    <section className="relative h-[400px] md:h-[75vh] w-full bg-gray-100 overflow-hidden group">
+    <section className="relative h-[200px] md:h-[75vh] w-full bg-gray-100 overflow-hidden group">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={page}
@@ -96,30 +96,44 @@ const HeroCarousel = () => {
           initial="enter"
           animate="center"
           exit="exit"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={1}
+          onDragEnd={(e, { offset, velocity }) => {
+            const swipe = swipePower(offset.x, velocity.x);
+
+            if (swipe < -swipeConfidenceThreshold) {
+              paginate(1);
+            } else if (swipe > swipeConfidenceThreshold) {
+              paginate(-1);
+            }
+          }}
           transition={{
             x: { type: "spring", stiffness: 300, damping: 30 },
             opacity: { duration: 0.4 }
           }}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full cursor-pointer"
         >
-          {/* Background Image */}
-          <img
-            src={currentBanner.image}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            alt={currentBanner.title}
-          />
-          
-          {/* Color Overlay */}
-          <div 
-            className="absolute inset-0" 
-            style={{ backgroundColor: currentBanner.overlayColor }}
-          />
+          <Link to={currentBanner.ctaLink} className="absolute inset-0 w-full h-full">
+            {/* Background Image */}
+            <img
+              src={currentBanner.image}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              alt={currentBanner.title}
+            />
+            
+            {/* Color Overlay */}
+            <div 
+              className="absolute inset-0" 
+              style={{ backgroundColor: currentBanner.overlayColor }}
+            />
 
-          {/* Gradient for readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r md:from-black/40 md:via-transparent md:to-transparent" />
+            {/* Gradient for readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r md:from-black/40 md:via-transparent md:to-transparent" />
+          </Link>
 
-          {/* Content Overlay */}
-          <div className={`absolute inset-0 flex flex-col justify-center px-6 md:px-20 z-10 
+          {/* Content Overlay - Hidden on Mobile, Shown on Desktop */}
+          <div className={`absolute inset-0 pointer-events-none hidden md:flex flex-col justify-center px-6 md:px-20 z-10 
             ${currentBanner.textAlign === 'center' ? 'items-center text-center' : 
               currentBanner.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}
           >
@@ -129,19 +143,22 @@ const HeroCarousel = () => {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="max-w-3xl"
             >
-              <h2 className="text-white text-[28px] md:text-[64px] font-black uppercase tracking-tighter leading-[0.9] mb-4 drop-shadow-2xl">
-                {currentBanner.title.split(' ').map((word, i) => (
-                  <span key={i} className="block">{word}</span>
-                ))}
+              <h2 className="text-white text-[18px] md:text-[64px] font-black uppercase tracking-tighter leading-tight mb-2 md:mb-4 drop-shadow-2xl">
+                <span className="md:hidden">{currentBanner.title}</span>
+                <span className="hidden md:block">
+                  {currentBanner.title.split(' ').map((word, i) => (
+                    <span key={i} className="block">{word}</span>
+                  ))}
+                </span>
               </h2>
               
-              <p className="text-white/80 text-[12px] md:text-[16px] font-medium max-w-lg mb-8 leading-relaxed uppercase tracking-widest">
+              <p className="text-white/70 text-[9px] md:text-[16px] font-medium max-w-[150px] md:max-w-lg mb-4 md:mb-8 leading-relaxed uppercase tracking-widest">
                 {currentBanner.subtitle}
               </p>
 
               <Link 
                 to={currentBanner.ctaLink}
-                className="inline-block bg-white text-black px-8 py-3 md:px-12 md:py-5 text-[10px] md:text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 shadow-xl active:scale-95"
+                className="inline-block bg-white text-black pointer-events-auto px-6 py-2.5 md:px-12 md:py-5 text-[9px] md:text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 shadow-xl active:scale-95"
               >
                 {currentBanner.ctaText}
               </Link>
@@ -151,7 +168,7 @@ const HeroCarousel = () => {
       </AnimatePresence>
 
       {/* Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+      <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 md:gap-3 z-20">
         {banners.map((_, i) => (
           <button
             key={i}
@@ -169,6 +186,14 @@ const HeroCarousel = () => {
       </div>
     </section>
   );
+};
+
+/**
+ * Swipe Logic Constants
+ */
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset, velocity) => {
+  return Math.abs(offset) * velocity;
 };
 
 export default HeroCarousel;

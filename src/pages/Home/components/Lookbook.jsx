@@ -16,9 +16,9 @@ const Lookbook = () => {
           <h2 className="text-[18px] md:text-[28px] font-black text-gray-900 tracking-tighter uppercase leading-none">Editorial Lookbook</h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 w-full">
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-1 md:gap-6 w-full">
           {stores.map((store, i) => (
-            <Link key={i} to={store.path} className={`relative rounded-sm overflow-hidden aspect-[4/5] md:aspect-[16/9] shadow-sm group cursor-pointer border border-gray-100 ${i === 2 ? 'hidden md:block' : ''}`}>
+            <Link key={i} to={store.path} className={`relative rounded-sm overflow-hidden aspect-[3/4] md:aspect-[16/9] shadow-sm group cursor-pointer border border-gray-100`}>
               <img 
                 src={store.img} 
                 alt={store.label} 
@@ -26,11 +26,11 @@ const Lookbook = () => {
                 decoding="async"
                 className="w-full h-full object-cover transition-all duration-[1s] group-hover:scale-105" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-40 group-hover:opacity-60 transition-all duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-all duration-500" />
 
-              <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6">
-                <h4 className="text-[12px] md:text-[18px] font-black tracking-tighter uppercase text-white leading-tight translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{store.label}</h4>
-                <p className="text-[7px] md:text-[10px] font-bold uppercase tracking-widest text-white/70 translate-y-2 group-hover:translate-y-0 transition-transform duration-700">{store.sub}</p>
+              <div className="absolute inset-0 flex flex-col justify-end p-2 md:p-6">
+                <h4 className="text-[8px] md:text-[18px] font-black tracking-tighter uppercase text-white leading-tight translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{store.label}</h4>
+                <p className="text-[6px] md:text-[10px] font-bold uppercase tracking-widest text-white/70 translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-transform duration-700">{store.sub}</p>
               </div>
             </Link>
           ))}

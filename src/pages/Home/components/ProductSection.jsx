@@ -11,7 +11,7 @@ const ProductSection = ({
   theme = "light",
   gridCols = "md:grid-cols-5",
   maxContentWidth = "max-w-[1600px]",
-  mobileGridCols = "grid grid-cols-2"
+  mobileGridCols = "flex overflow-x-auto gap-2 snap-x snap-proximity overscroll-x-contain"
 }) => {
   const isDark = theme === "dark";
 
@@ -39,9 +39,9 @@ const ProductSection = ({
           </Link>
         </div>
 
-        <div className={`${mobileGridCols} md:grid ${gridCols} gap-4 md:gap-8 pb-2 md:pb-0 hide-scrollbar px-0 md:px-0`}>
+        <div className={`${mobileGridCols} md:grid ${gridCols} md:gap-8 pb-4 md:pb-0 hide-scrollbar px-0 md:px-0`}>
           {products.map(product => (
-            <div key={product.id} className="w-auto group">
+            <div key={product.id} className="min-w-[calc(33.33%-8px)] md:min-w-0 md:w-auto snap-start group">
               <ProductCard product={product} />
             </div>
           ))}

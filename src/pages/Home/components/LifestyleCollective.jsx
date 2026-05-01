@@ -22,7 +22,7 @@ const LifestyleCollective = () => {
           <span className="text-[9px] md:text-[11px] font-black tracking-[0.4em] uppercase text-brand-gold">Curated Lifestyle</span>
           <h2 className="text-[20px] md:text-[32px] font-black tracking-tighter uppercase text-black">The Luxe Collective</h2>
         </div>
-        <div className="overflow-x-auto hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="overflow-x-auto hide-scrollbar overscroll-x-contain -mx-4 px-4 md:mx-0 md:px-0">
           <div className="flex gap-4 md:gap-10 min-w-max">
             {items.map((item, idx) => (
               <Link key={idx} to={item.path} className="flex flex-col items-center gap-3 group cursor-pointer w-20 md:w-32">

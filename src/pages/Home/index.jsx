@@ -15,7 +15,7 @@ const Home = () => {
   const products = useGlobalStore(state => state.products);
 
   return (
-    <main className="bg-white">
+    <main className="bg-white overflow-x-hidden">
       <HeroCarousel />
       <CategoryNav />
 
@@ -33,7 +33,6 @@ const Home = () => {
         subtitle="Signature Collection"
         theme="dark"
         gridCols="md:grid-cols-3"
-        mobileGridCols="grid grid-cols-3 gap-2"
         maxContentWidth="max-w-5xl"
         viewAllPath="/shop?category=Luxury Signature"
         products={products.slice(29, 32)}
